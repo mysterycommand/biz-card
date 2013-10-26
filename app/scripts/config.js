@@ -12,8 +12,8 @@
 require.config({
     deps: ['main'],
     paths: {
-        jquery: '../bower_components/jquery/jquery',
-        lodash: '../bower_components/lodash/dist/lodash'
+        jquery: '../bower_components/jquery/jquery'
+        // lodash: '../bower_components/lodash/dist/lodash'
     },
     shim: {}
 });

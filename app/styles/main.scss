@@ -163,6 +163,11 @@ nav a {
     display: flex;
     flex-flow: column nowrap;
 
+    &.flex-center {
+        align-items: center;
+        justify-content: center;
+    }
+
     >.flex-item { flex-basis: auto; }
     >.flex-item-fixed { flex: 0 0 auto; }
     >.flex-item-flood { flex: 1 1 auto; }
@@ -179,9 +184,9 @@ nav a {
     position: relative;
 
     &>.inner {
-        overflow: scroll;
-        -webkit-overflow-scrolling: touch;
-        overflow-scrolling: touch;
+        overflow: hidden;
+//        -webkit-overflow-scrolling: touch;
+//        overflow-scrolling: touch;
         position: absolute;
             top: 0;
             right: 0;
@@ -191,6 +196,109 @@ nav a {
 }
 
 .hlist li { display: inline-block; }
+
+.flip-container {
+    height: 381px + (1px / 3px);
+    perspective: 1000;
+    position: relative;
+    transform: translateZ(0);
+    width: 214.5px;
+
+    * { transform-style: preserve-3d; }
+
+//    &:hover>.card,
+//    &.hover>.card {
+//        transform: rotateY(180deg);
+//    }
+}
+
+//.card,
+//.front,
+//.back { overflow: visible; }
+
+.card {
+    box-shadow: 0px 0px 30px 3px rgba(0,0,0,0.3);
+    height: 100%;
+    position: absolute;
+        top: 0;
+        left: 0;
+    transition: 0.4s;
+    width: 100%;
+
+    &.show-front { transform: rotateY(0deg); }
+    &.show-back { transform: rotateY(180deg); }
+}
+
+.front,
+.back {
+    position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+}
+
+.front {
+    transform: translateZ(0.5px);
+}
+
+.back {
+    background: rgba(255,255,255,0.2);
+    box-sizing: border-box;
+    padding: 46px + (2px / 3px) 24.75px;
+    transform: rotateY(180deg);
+}
+
+.h-card {
+    color: #FFFFFF;
+    display: block;
+    font-style: normal;
+    font-weight: normal;
+    margin: 0 auto;
+    position: absolute;
+        bottom: 46px + (2px / 3px);
+
+    li { line-height: 0.95; }
+    span, a { letter-spacing: 1px; }
+    a {
+        color: inherit;
+        font-size: 12px;
+    }
+}
+
+@mixin hover {
+    height: 100%;
+//    opacity: 0.5;
+    position: absolute;
+        top: 0;
+    width: 50%;
+    transform: translateZ(100px);
+
+//    &:hover {
+//        opacity: 1;
+//    }
+}
+
+.hover-left,
+.hover-right {
+    @include hover;
+}
+
+.hover-left {
+//    background: orange;
+    left: 0;
+}
+
+.hover-right {
+//    background: teal;
+    right: 0;
+}
+
+//$angle: 15deg;
+//.hover-left:hover ~ .card.show-front { transform: rotateY(0deg + $angle); }
+//.hover-right:hover ~ .card.show-front { transform: rotateY(0deg - $angle); }
+//.hover-left:hover ~ .card.show-back { transform: rotateY(180deg + $angle); }
+//.hover-right:hover ~ .card.show-back { transform: rotateY(180deg - $angle); }
 
 
 
