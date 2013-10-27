@@ -8,12 +8,12 @@ $solid6: #666666;
 $solid7: #777777;
 $solid8: #888888;
 $solid9: #999999;
-$solidA: #AAAAAA;
-$solidB: #BBBBBB;
-$solidC: #CCCCCC;
-$solidD: #DDDDDD;
-$solidE: #EEEEEE;
-$solidF: #FFFFFF;
+$solidA: #aaaaaa;
+$solidB: #bbbbbb;
+$solidC: #cccccc;
+$solidD: #dddddd;
+$solidE: #eeeeee;
+$solidF: #ffffff;
 
 $alpha0: rgba(0,0,0,15 * (1 / 15));
 $alpha1: rgba(0,0,0,14 * (1 / 15));
@@ -222,11 +222,9 @@ nav a {
     position: absolute;
         top: 0;
         left: 0;
+    transform: rotateY(0deg);
     transition: 0.4s;
     width: 100%;
-
-    &.show-front { transform: rotateY(0deg); }
-    &.show-back { transform: rotateY(180deg); }
 }
 
 .front,
@@ -250,7 +248,7 @@ nav a {
 }
 
 .h-card {
-    color: #FFFFFF;
+    color: #ffffff;
     display: block;
     font-style: normal;
     font-weight: normal;
@@ -265,40 +263,6 @@ nav a {
         font-size: 12px;
     }
 }
-
-@mixin hover {
-    height: 100%;
-//    opacity: 0.5;
-    position: absolute;
-        top: 0;
-    width: 50%;
-    transform: translateZ(100px);
-
-//    &:hover {
-//        opacity: 1;
-//    }
-}
-
-.hover-left,
-.hover-right {
-    @include hover;
-}
-
-.hover-left {
-//    background: orange;
-    left: 0;
-}
-
-.hover-right {
-//    background: teal;
-    right: 0;
-}
-
-//$angle: 15deg;
-//.hover-left:hover ~ .card.show-front { transform: rotateY(0deg + $angle); }
-//.hover-right:hover ~ .card.show-front { transform: rotateY(0deg - $angle); }
-//.hover-left:hover ~ .card.show-back { transform: rotateY(180deg + $angle); }
-//.hover-right:hover ~ .card.show-back { transform: rotateY(180deg - $angle); }
 
 
 

@@ -13,31 +13,9 @@ define([
 
     'jquery'
 
-    // 'svg/NS',
-    // 'svg/SVG',
-    // 'svg/Group',
-
-    // 'svg/Circle',
-    // 'svg/Line',
-    // 'svg/Path',
-    // 'svg/Rect',
-    // 'svg/Text',
-    // 'svg/TSpan'
-
 ], function (
 
     $
-
-    // NS,
-    // SVG,
-    // Group,
-
-    // Circle,
-    // Line,
-    // Path,
-    // Rect,
-    // Text,
-    // TSpan
 
 ) {
 
@@ -45,12 +23,9 @@ define([
 
     return function() {
         var $card = $('#js-card'),
-            cardOffset = $card.offset(),
-            cardWidth = $card.width(),
-            startX,
-            startDeg,
-            deg;
-            // $front = $('#js-front');
+            previousX,
+            currentX,
+            currentDeg = 0;
 
         function onKeyUp(event) {
             event.preventDefault();
@@ -71,28 +46,12 @@ define([
         }
 
         function onPointerDown(event) {
+            if ($(event.target).is('a')) { return; }
             event.preventDefault();
 
-            startX = event.pageX || event.originalEvent.pageX;
+            previousX = currentX = event.pageX || event.originalEvent.pageX;
 
-            if (cardOffset.left > startX ||
-                startX > cardOffset.left + cardWidth) { return; }
-
-            $card.css({
-                transition: 'none'
-            });
-
-            var style = window.getComputedStyle($card[0], null),
-                trans = style.getPropertyValue('-webkit-transform') ||
-                        style.getPropertyValue('-moz-transform') ||
-                        style.getPropertyValue('-ms-transform') ||
-                        style.getPropertyValue('-o-transform') ||
-                        style.getPropertyValue('transform'),
-                ident = [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
-                value = (trans === 'none') ? ident : trans.split('(')[1].split(')')[0].split(', ');
-
-            startDeg = Math.round(toDegrees(Math.asin(value[8])));
-            console.log(value);
+            $card.css({ transition: 'none' });
 
             $(window)
                 .on('touchmove', onPointerMove)
@@ -102,23 +61,27 @@ define([
         function onPointerMove(event) {
             event.preventDefault();
 
-            var pageX = event.pageX || event.originalEvent.pageX;
+            previousX = currentX;
+            currentX = event.pageX || event.originalEvent.pageX;
+            currentDeg += (currentX - previousX);
 
-            deg = startDeg + (pageX - startX) / 2;
-            while (deg > 180) { deg -= 360; }
-            while (deg < -180) { deg += 360; }
+            while (currentDeg > 180) { currentDeg -= 360; }
+            while (currentDeg < -180) { currentDeg += 360; }
 
-            console.log(deg);
             $card.css({
-                transform: 'rotateY(' + deg + 'deg)'
+                transform: 'rotateY(' + currentDeg + 'deg)'
             });
         }
 
         function onPointerUp(event) {
+            if ($(event.target).is('a')) { return; }
             event.preventDefault();
 
+            var d = currentDeg / Math.abs(currentDeg);
+            currentDeg = (Math.abs(currentDeg) > 90) ? d * 180 : 0;
+
             $card.css({
-                transform: '',
+                transform: 'rotateY(' + currentDeg + 'deg)',
                 transition: ''
             });
 
