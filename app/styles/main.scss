@@ -201,7 +201,9 @@ nav a {
     height: 381px + (1px / 3px);
     perspective: 1000;
     position: relative;
-    transform: translateZ(0);
+    transform:
+        // rotateZ(90deg)
+        translateZ(0);
     width: 214.5px;
 
     * { transform-style: preserve-3d; }
@@ -250,17 +252,26 @@ nav a {
 .h-card {
     color: #ffffff;
     display: block;
+    font-size: 134%;
     font-style: normal;
     font-weight: normal;
-    margin: 0 auto;
+    letter-spacing: 1px;
+    // line-height: 1;
+    margin: 0;
     position: absolute;
         bottom: 46px + (2px / 3px);
+    transform:
+        rotateZ(-90deg)
+        translateY(100%);
+    transform-origin: left bottom 0;
 
     li { line-height: 0.95; }
-    span, a { letter-spacing: 1px; }
+    // span, a { letter-spacing: 1px; }
+    .p-name { margin-left: 2px; }
+    .protocol { letter-spacing: 0.75px; }
     a {
         color: inherit;
-        font-size: 12px;
+        font-size: percentage(1 / 1.34);
     }
 }
 
