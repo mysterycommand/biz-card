@@ -29,7 +29,8 @@ define([
         var $card = $('.card'),
             $window = $(window),
             w = $card.width(),
-            h = $card.height();
+            h = $card.height(),
+            card = null;
 
         $card.each(function(index, element) {
             var card = new Card(w, h);
@@ -72,12 +73,13 @@ define([
                 start = null,
                 delta = 0;
 
+            card || (card = $(this).data('card'));
             setupPointerEvents($card, $window);
             $window.on('keyup', toggleTimer);
         }
 
         $card.on('click tap', function() {
-            var card = $(this).data('card');
+            card || (card = $(this).data('card'));
             card.draw();
             stopTimer();
         });
