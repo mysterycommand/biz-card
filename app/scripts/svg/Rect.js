@@ -19,7 +19,7 @@ define([
 
     'use strict';
 
-    function Rect(x, y, w, h, stroke, strokeWidth, fill, fillOpacity) {
+    function Rect(x, y, w, h, stroke, strokeWidth, fill, fillOpacity, attrs) {
         /* jshint expr: true */
         stroke || (stroke = 'black');
         strokeWidth || (strokeWidth = 1);
@@ -28,6 +28,7 @@ define([
         fillOpacity || (fillOpacity = '1');
 
         var rect = document.createElementNS(NS.SVG, 'rect');
+
         rect.setAttributeNS(null, 'x', x);
         rect.setAttributeNS(null, 'y', y);
         rect.setAttributeNS(null, 'width', w);
@@ -36,6 +37,11 @@ define([
         rect.setAttributeNS(null, 'fill-opacity', fillOpacity);
         rect.setAttributeNS(null, 'stroke', stroke);
         rect.setAttributeNS(null, 'stroke-width', strokeWidth);
+
+        Object.keys(attrs || {}).forEach(function(key) {
+            rect.setAttributeNS(null, key, attrs[key]);
+        });
+
         return rect;
     }
 

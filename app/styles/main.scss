@@ -79,10 +79,12 @@ $alphaF: rgba(0,0,0,00 * (1 / 15));
 $bkgd: #e7e7e7;
 $fore: #fafafa;
 
+$blck: $solid0;
 $dark: $solid2;
 $copy: $solid4;
 $grey: $solid6;
 $lght: $solid8;
+$whte: $solidF;
 
 $aDark: $alpha2;
 $aCopy: $alpha4;
@@ -90,8 +92,8 @@ $aGrey: $alpha6;
 $aLght: $alpha8;
 
 $fontSize: 16px;
-$fontFamily: "HelveticaNeue-UltraLight",
-             "Helvetica Neue UltraLight",
+$fontFamily: /* "HelveticaNeue-UltraLight",
+             "Helvetica Neue UltraLight", */
              "HelveticaNeue-Light",
              "Helvetica Neue Light",
              "Helvetica Neue",
@@ -112,7 +114,7 @@ body {
 }
 
 main {
-    background: $fore url('../images/background.jpg') bottom center no-repeat;
+    background: $fore url(../images/background.jpg) bottom center no-repeat;
     background-size: cover;
     box-shadow: 0 0 40px 0 $aCopy;
     overflow: hidden;
@@ -198,13 +200,13 @@ nav a {
 .hlist li { display: inline-block; }
 
 .flip-container {
-    height: 381px + (1px / 3px);
+    height: 84mm;
     perspective: 1000;
     position: relative;
     transform:
         // rotateZ(90deg)
         translateZ(0);
-    width: 214.5px;
+    width: 55mm;
 
     * { transform-style: preserve-3d; }
 
@@ -239,20 +241,22 @@ nav a {
 }
 
 .front {
+    background: $whte;
     transform: translateZ(0.5px);
 }
 
 .back {
-    background: rgba(255,255,255,0.2);
+    background: $whte;
     box-sizing: border-box;
     padding: 46px + (2px / 3px) 24.75px;
     transform: rotateY(180deg);
 }
 
+$scale: 24 / 16;
 .h-card {
-    color: #ffffff;
+    color: $dark;
     display: block;
-    font-size: 134%;
+    font-size: percentage($scale);
     font-style: normal;
     font-weight: normal;
     letter-spacing: 1px;
@@ -265,13 +269,18 @@ nav a {
         translateY(100%);
     transform-origin: left bottom 0;
 
-    li { line-height: 0.95; }
-    // span, a { letter-spacing: 1px; }
+    .tight { letter-spacing: 0.1px; }
+    li { line-height: (20 / 24); }
     .p-name { margin-left: 2px; }
-    .protocol { letter-spacing: 0.75px; }
+
+    .protocol {
+        bottom: 0;
+        position: absolute;
+    }
+
     a {
         color: inherit;
-        font-size: percentage(1 / 1.34);
+        font-size: percentage(1 / $scale);
     }
 }
 
