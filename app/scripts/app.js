@@ -51,19 +51,28 @@ define([
             }
         }
 
-        function toggle(event) {
-            if (event.which !== 32) { return; }
-            if (frame === null) {
-                frame = window.requestAnimationFrame(updateCard);
-                card.draw();
-            } else {
-                window.cancelAnimationFrame(frame);
-                frame = null;
-            }
+        function startTimer() {
+            frame = window.requestAnimationFrame(updateCard);
+            card.draw();
         }
 
-        $card.on('tap', function() { card.draw(); });
-        $window.on('keyup', toggle);
+        function stopTimer() {
+            if (frame === null) { return; }
+            window.cancelAnimationFrame(frame);
+            frame = null;
+        }
+
+        function toggleTimer(event) {
+            if (event.which !== 32) { return; }
+            if (frame === null) { startTimer(); }
+            else { stopTimer(); }
+        }
+
+        $window.on('keyup', toggleTimer);
+        $card.on('tap', function() {
+            card.draw();
+            stopTimer();
+        });
     };
 
 });
