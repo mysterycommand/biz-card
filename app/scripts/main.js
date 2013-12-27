@@ -11,7 +11,9 @@ require([
 
     'jquery',
     // 'lodash',
-    'app'
+    'app',
+
+    'polyfill/window.requestAnimationFrame'
 
 ], function (
 

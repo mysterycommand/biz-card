@@ -21,6 +21,7 @@ define([
     'svg/Rect',
 
     'util/coinToss',
+    'util/percentChance',
     'util/randomHex'
 
 ], function (
@@ -35,6 +36,7 @@ define([
     Rect,
 
     coinToss,
+    percentChance,
     randomHex
 
 ) {
@@ -138,49 +140,64 @@ define([
         }
     };
 
-    function attrs(hex) {
+    function randomAttrs(hex, maxStrokeWidth) {
         hex || (hex = randomHex());
+        maxStrokeWidth || (maxStrokeWidth = 10);
         var fill = coinToss(),
-            stroke = ! fill;
-
-        return {
-                'fill': fill ? hex : 'none',
-                'fill-opacity': fill ? 0.25 + Math.random() * 0.25 : '0',
-                'stroke': stroke ? hex : 'none',
-                'stroke-opacity': stroke ? 0.5 + Math.random() * 0.5 : '0',
-                'stroke-width': stroke ? Math.round(Math.random() * 10) / 2 : '0',
-                'stroke-dasharray': stroke ? '' : ''
+            stroke = coinToss(), // ! fill;
+            strokeWidth = Math.ceil(Math.random() * maxStrokeWidth) / 2,
+            attrs = {
+                'fill': 'none',
+                'stroke': 'none'
             };
+
+        if (fill) {
+            attrs.fill = hex;
+            attrs['fill-opacity'] = 0.25 + Math.random() * 0.25;
+        }
+        
+        if (stroke) {
+            attrs.stroke = hex;
+            attrs['stroke-opacity'] = 0.5 + Math.random() * 0.5;
+            attrs['stroke-width'] = strokeWidth;
+        }
+
+        if (stroke && percentChance(20)) {
+            attrs['stroke-dasharray'] = [0.001, strokeWidth * 2].join(' ');
+            attrs['stroke-linecap'] = coinToss() ? 'round' : 'square';
+        }
+
+        return attrs;
     }
 
     Card.prototype.drawFront = function() {
         var elements = {
             // white: new Rect(bx, by, this.bw, this.bh, 'none', '0', '#ffffff'),
-            background: new Rect(this.bx, this.by, this.bw, this.bh, null, null, null, null, attrs()),
+            background: new Rect(this.bx, this.by, this.bw, this.bh, null, null, null, null, randomAttrs(null, 100)),
 
-            centerCircle: new Circle(this.hw, this.hh, this.r2, null, null, attrs(this.hex1)),
-            centerCircleSquared: new Rect(this.hw - this.hs, this.hh - this.hs, this.s2, this.s2, null, null, null, null, attrs(this.hex2)),
+            centerCircle: new Circle(this.hw, this.hh, this.r2, null, null, randomAttrs(this.hex1)),
+            centerCircleSquared: new Rect(this.hw - this.hs, this.hh - this.hs, this.s2, this.s2, null, null, null, null, randomAttrs(this.hex2)),
 
-            squaredCircle: new Circle(this.hw, this.hh, this.hs, null, null, attrs(this.hex3)),
+            squaredCircle: new Circle(this.hw, this.hh, this.hs, null, null, randomAttrs(this.hex3)),
 
-            topRightSquare: new Rect(this.hw + this.hs, this.hh - this.hs - this.d2, this.d2, this.d2, null, null, null, null, attrs(this.hex2)),
-            topRightCircle: new Circle(this.hw + this.hs + this.r2, this.hh - this.hs - this.r2, this.r2, null, null, attrs(this.hex3)),
+            topRightSquare: new Rect(this.hw + this.hs, this.hh - this.hs - this.d2, this.d2, this.d2, null, null, null, null, randomAttrs(this.hex2)),
+            topRightCircle: new Circle(this.hw + this.hs + this.r2, this.hh - this.hs - this.r2, this.r2, null, null, randomAttrs(this.hex3)),
 
-            bottomRightSquare: new Rect(this.hw + this.hs, this.hh + this.hs, this.d2, this.d2, null, null, null, null, attrs(this.hex2)),
-            bottomRightCircle: new Circle(this.hw + this.hs + this.r2, this.hh + this.hs + this.r2, this.r2, null, null, attrs(this.hex3)),
-            bottomLeftCircle: new Circle(this.hw - this.hs, this.hh + this.hs, this.r0, null, null, attrs(this.hex2)),
+            bottomRightSquare: new Rect(this.hw + this.hs, this.hh + this.hs, this.d2, this.d2, null, null, null, null, randomAttrs(this.hex2)),
+            bottomRightCircle: new Circle(this.hw + this.hs + this.r2, this.hh + this.hs + this.r2, this.r2, null, null, randomAttrs(this.hex3)),
+            bottomLeftCircle: new Circle(this.hw - this.hs, this.hh + this.hs, this.r0, null, null, randomAttrs(this.hex2)),
 
-            topLeftBigCircle: new Circle(this.cx1, this.cy1, this.r3, null, null, attrs(this.hex4)),
-            topLeftBigCircleSpine: new Circle(this.cx2, this.cy2, this.r3, null, null, attrs(this.hex4)),
+            topLeftBigCircle: new Circle(this.cx1, this.cy1, this.r3, null, null, randomAttrs(this.hex4)),
+            topLeftBigCircleSpine: new Circle(this.cx2, this.cy2, this.r3, null, null, randomAttrs(this.hex4)),
 
-            hypotenuse: new Line(this.cx1, this.cy1, this.cx2, this.cy2, null, null, attrs(this.hex5)),
-            adjacent: new Line(this.cx2, this.cy2, this.hw - this.hs, this.hh - this.hs, null, null, attrs(this.hex5)),
-            opposite: new Line(this.hw - this.hs, this.hh - this.hs, this.cx1, this.cy1, null, null, attrs(this.hex5)),
+            hypotenuse: new Line(this.cx1, this.cy1, this.cx2, this.cy2, null, null, randomAttrs(this.hex5)),
+            adjacent: new Line(this.cx2, this.cy2, this.hw - this.hs, this.hh - this.hs, null, null, randomAttrs(this.hex5)),
+            opposite: new Line(this.hw - this.hs, this.hh - this.hs, this.cx1, this.cy1, null, null, randomAttrs(this.hex5)),
 
-            golden: new Line(this.px1, this.py1, this.cx1, this.cy1, null, null, attrs(this.hex5)),
-            incedence: new Line(this.cx1, this.cy1, this.px2, this.py2, null, null, attrs(this.hex5)),
+            golden: new Line(this.px1, this.py1, this.cx1, this.cy1, null, null, randomAttrs(this.hex5)),
+            incedence: new Line(this.cx1, this.cy1, this.px2, this.py2, null, null, randomAttrs(this.hex5)),
 
-            boundingBox: new Rect(this.rx, this.ry, this.rw, this.rh, null, null, null, null, attrs(this.hex7))
+            boundingBox: new Rect(this.rx, this.ry, this.rw, this.rh, null, null, null, null, randomAttrs(this.hex7))
 
             // lineTL: new Line(this.hw, this.hh, this.bx, this.by, '#000'),
             // lineTR: new Line(this.hw, this.hh, this.bx + this.bw, this.by, '#000'),
@@ -202,9 +219,10 @@ define([
     };
 
     Card.prototype.drawPath = function() {
-        var strokeWidth = Math.random() * 20,
+        var strokeWidth = Math.ceil(Math.random() * 20),
             path1 = new Path(this.hex0, Math.random(), strokeWidth),
-            path2 = new Path(this.hex8, Math.random(), strokeWidth);
+            path2 = new Path(this.hex8, Math.random(), strokeWidth),
+            strokeLinecap;
 
         path1.setAttributeNS(null, 'd', [
             'M', this.px1, this.py1,
@@ -216,7 +234,6 @@ define([
             'A', this.r2, this.r2, 0, 1, 0, this.hw + this.hs + this.r2, this.hh + this.hs,
             'L', this.hw + this.hs, this.hh + this.hs
         ].join(' '));
-        this.front.appendChild(path1);
 
         path2.setAttributeNS(null, 'd', [
             'M', this.hw - this.hs + this.r0, this.hh + this.hs - this.r0,
@@ -224,6 +241,20 @@ define([
             'A', this.r0, this.r0, 0, 1, 0, this.hw - this.hs + this.r0, this.hh + this.hs,
             'Z'
         ].join(' '));
+
+        if (strokeWidth < 11 && percentChance(20)) {
+            strokeLinecap = coinToss() ? 'round' : 'square';
+
+            path1.setAttributeNS(null, 'stroke-dasharray', [0.001, strokeWidth * 2].join(' '));
+            path1.setAttributeNS(null, 'stroke-linecap', strokeLinecap);
+            
+            if (strokeWidth < 4) {
+                path2.setAttributeNS(null, 'stroke-dasharray', [0.001, strokeWidth * 2].join(' '));
+                path2.setAttributeNS(null, 'stroke-linecap', strokeLinecap);
+            }
+        }
+
+        this.front.appendChild(path1);
         this.front.appendChild(path2);
     };
 

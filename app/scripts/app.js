@@ -35,6 +35,23 @@ define([
         setupPointerEvents($card, $(window));
 
         $card.on('tap', function() { card.draw(); });
+
+        var start = null,
+            delta = 0;
+
+        function updateCard(timestamp) {
+            window.requestAnimationFrame(updateCard);
+            start || (start = timestamp);
+            delta = timestamp - start;
+
+            if (delta > 1500) {
+                start = null;
+                delta = 0;
+                card.draw();
+            }
+        }
+
+        window.requestAnimationFrame(updateCard);
     };
 
 });

@@ -4,4 +4,5 @@ dist
 .sass-cache
 app/bower_components
 
+art/
 .DS_Store
