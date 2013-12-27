@@ -34,7 +34,7 @@ define([
         $('#js-front').append(card.svg);
         setupPointerEvents($card, $(window));
 
-        $card.on('click', function() { card.draw(); });
+        $card.on('tap', function() { card.draw(); });
     };
 
 });

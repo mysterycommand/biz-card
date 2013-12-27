@@ -74,7 +74,7 @@ define([
                 .off('touchmove', onPointerMove)
                 .off('mousemove', onPointerMove);
 
-            if ( ! hasMoved) { $(event.target).trigger('click'); }
+            if ( ! hasMoved) { $(event.target).trigger('tap'); }
             hasMoved = false;
         }
 

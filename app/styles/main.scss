@@ -242,17 +242,63 @@ nav a {
 
 .front {
     background: $whte;
-    transform: translateZ(0.5px);
+    transform: translateZ(1.5px);
 }
 
 .back {
     background: $whte;
     box-sizing: border-box;
-    padding: 46px + (2px / 3px) 24.75px;
-    transform: rotateY(180deg);
+    padding: 32px;
+    transform:
+        rotateY(180deg)
+        translateZ(1.5px);
 }
 
-$scale: 24 / 16;
+.edge {
+    background: $blck;
+    border: 1px solid $whte;
+    position: absolute;
+
+    &.top,
+    &.bottom {
+        border-left: none;
+        border-right: none;
+        height: 1px;
+        left: 0;
+        right: 0;
+    }
+
+    &.right,
+    &.left {
+        border-top: none;
+        border-bottom: none;
+        bottom: 0;
+        top: 0;
+        width: 1px;
+    }
+
+    &.top {
+        top: 0;
+        transform: rotateX(90deg);
+    }
+
+    &.right {
+        right: 0;
+        transform: rotateY(90deg);
+    }
+
+    &.bottom {
+        bottom: 0;
+        transform: rotateX(-90deg);
+    }
+
+    &.left {
+        left: 0;
+        transform: rotateY(-90deg);
+    }
+}
+
+$scale: 17 / 16;
 .h-card {
     color: $dark;
     display: block;
@@ -263,14 +309,14 @@ $scale: 24 / 16;
     // line-height: 1;
     margin: 0;
     position: absolute;
-        bottom: 46px + (2px / 3px);
+        bottom: 32px;
     transform:
         rotateZ(-90deg)
         translateY(100%);
     transform-origin: left bottom 0;
 
     .tight { letter-spacing: 0.1px; }
-    li { line-height: (20 / 24); }
+    li { line-height: (15 / 18); }
     .p-name { margin-left: 2px; }
 
     .protocol {
@@ -280,7 +326,7 @@ $scale: 24 / 16;
 
     a {
         color: inherit;
-        font-size: percentage(1 / $scale);
+        font-size: percentage(13 / 18);
     }
 }
 
