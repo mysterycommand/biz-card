@@ -26,18 +26,17 @@ define([
     'use strict';
 
     return function() {
-        var $card = $('#js-card'),
+        var $card = $('.card'),
             $window = $(window),
             w = $card.width(),
-            h = $card.height(),
-            card = new Card(w, h);
+            h = $card.height();
 
-        $('#js-front').append(card.svg);
-        setupPointerEvents($card, $window);
-
-        var frame = null,
-            start = null,
-            delta = 0;
+        $card.each(function(index, element) {
+            var card = new Card(w, h);
+            $(element)
+                .data('card', card)
+                .find('.front').append(card.svg);
+        });
 
         function updateCard(timestamp) {
             frame = window.requestAnimationFrame(updateCard);
@@ -68,8 +67,17 @@ define([
             else { stopTimer(); }
         }
 
-        $window.on('keyup', toggleTimer);
-        $card.on('tap', function() {
+        if ($card.length === 1) {
+            var frame = null,
+                start = null,
+                delta = 0;
+
+            setupPointerEvents($card, $window);
+            $window.on('keyup', toggleTimer);
+        }
+
+        $card.on('click tap', function() {
+            var card = $(this).data('card');
             card.draw();
             stopTimer();
         });

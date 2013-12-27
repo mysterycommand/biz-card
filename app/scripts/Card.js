@@ -129,7 +129,7 @@ define([
         this.rh = ~~(this.r3 + this.b + this.s2 + this.d2);
 
         this.bw = this.w; // this.rw * 1.3;
-        this.bh = 84 * (this.bw / 55);
+        this.bh = Math.round(88 * (this.bw / 59));
         this.bx = this.rx - (this.bw - this.rw) / 2;
         this.by = this.ry - (this.bh - this.rh) / 2;
     };
