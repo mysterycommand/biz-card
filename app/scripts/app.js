@@ -35,9 +35,6 @@ define([
         $('#js-front').append(card.svg);
         setupPointerEvents($card, $window);
 
-        $card.on('tap', function() { card.draw(); });
-        $window.on('keyup', toggle);
-
         var frame = null,
             start = null,
             delta = 0;
@@ -64,6 +61,9 @@ define([
                 frame = null;
             }
         }
+
+        $card.on('tap', function() { card.draw(); });
+        $window.on('keyup', toggle);
     };
 
 });
