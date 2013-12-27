@@ -27,31 +27,43 @@ define([
 
     return function() {
         var $card = $('#js-card'),
+            $window = $(window),
             w = $card.width(),
             h = $card.height(),
             card = new Card(w, h);
 
         $('#js-front').append(card.svg);
-        setupPointerEvents($card, $(window));
+        setupPointerEvents($card, $window);
 
         $card.on('tap', function() { card.draw(); });
+        $window.on('keyup', toggle);
 
-        var start = null,
+        var frame = null,
+            start = null,
             delta = 0;
 
         function updateCard(timestamp) {
-            window.requestAnimationFrame(updateCard);
+            frame = window.requestAnimationFrame(updateCard);
+
             start || (start = timestamp);
             delta = timestamp - start;
 
             if (delta > 1500) {
                 start = null;
-                delta = 0;
                 card.draw();
             }
         }
 
-        window.requestAnimationFrame(updateCard);
+        function toggle(event) {
+            if (event.which !== 32) { return; }
+            if (frame === null) {
+                frame = window.requestAnimationFrame(updateCard);
+                card.draw();
+            } else {
+                window.cancelAnimationFrame(frame);
+                frame = null;
+            }
+        }
     };
 
 });
