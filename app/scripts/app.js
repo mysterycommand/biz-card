@@ -33,6 +33,7 @@ define([
 
         $('#js-front').append(card.svg);
         setupPointerEvents($card, $(window));
+        $card.on('click', card.draw);
     };
 
 });

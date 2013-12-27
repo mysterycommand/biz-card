@@ -45,14 +45,14 @@ define([
         G = (2 * Math.PI) / (PHI * PHI);
 
     var Card = function Card(w, h) {
-    	this.w = w;
-    	this.h = h;
+        this.w = w;
+        this.h = h;
 
-    	// this.defs = document.createElementNS(NS.SVG, 'defs');
+        // this.defs = document.createElementNS(NS.SVG, 'defs');
         this.svg = new SVG(this.w, this.h);
         this.front = new Group(0, 0);
 
-    	this.draw();
+        this.draw();
     };
 
     // Card.prototype.createClipPath = function() {
@@ -62,10 +62,10 @@ define([
     // };
 
     Card.prototype.draw = function() {
-    	this.colors();
-    	this.recalc();
+        this.colors();
+        this.recalc();
 
-    	this.empty();
+        this.empty();
         this.drawFront();
         this.drawPath();
         this.center();
@@ -84,7 +84,7 @@ define([
     };
 
     Card.prototype.recalc = function() {
-    	this.r = 8.75;
+        this.r = 8.75;
 
         this.r0 = this.r * (8 / 13);
         this.r1 = this.r * (13 / 8);

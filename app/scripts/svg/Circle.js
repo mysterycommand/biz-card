@@ -39,7 +39,7 @@ define([
         // circle.setAttributeNS(null, 'fill-opacity', '0.5');
 
         Object.keys(attrs || {}).forEach(function(key) {
-            path.setAttributeNS(null, key, attrs[key]);
+            circle.setAttributeNS(null, key, attrs[key]);
         });
 
         return circle;
