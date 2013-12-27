@@ -24,7 +24,8 @@ define([
     return function setupPointerEvents($target, $delegateTarget) {
         var previousX,
             currentX,
-            currentDeg = 0;
+            currentDeg = 0,
+            hasMoved = false;
 
 
         function onPointerDown(event) {
@@ -53,6 +54,8 @@ define([
             $target.css({
                 transform: 'rotateY(' + currentDeg + 'deg)'
             });
+
+            hasMoved = true;
         }
 
         function onPointerUp(event) {
@@ -70,6 +73,9 @@ define([
             $delegateTarget
                 .off('touchmove', onPointerMove)
                 .off('mousemove', onPointerMove);
+
+            if ( ! hasMoved) { $(event.target).trigger('click'); }
+            hasMoved = false;
         }
 
         $delegateTarget
