@@ -28,8 +28,8 @@ define([
     return function() {
         var $card = $('.card'),
             $window = $(window),
-            w = $card.width(),
-            h = $card.height(),
+            w = 59, // $card.width(),
+            h = 88, // $card.height(),
             card = null;
 
         $card.each(function(index, element) {

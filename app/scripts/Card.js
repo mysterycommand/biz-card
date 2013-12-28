@@ -22,7 +22,8 @@ define([
 
     'util/coinToss',
     'util/percentChance',
-    'util/randomHex'
+    'util/randomHex',
+    'util/randomRange'
 
 ], function (
 
@@ -37,7 +38,8 @@ define([
 
     coinToss,
     percentChance,
-    randomHex
+    randomHex,
+    randomRange
 
 ) {
 
@@ -86,7 +88,7 @@ define([
     };
 
     Card.prototype.recalc = function() {
-        this.r = 8.75;
+        this.r = randomRange(2, 4); // (8.75 / 223) * 59;
 
         this.r0 = this.r * (8 / 13);
         this.r1 = this.r * (13 / 8);
@@ -129,7 +131,7 @@ define([
         this.rh = ~~(this.r3 + this.b + this.s2 + this.d2);
 
         this.bw = this.w; // this.rw * 1.3;
-        this.bh = Math.round(88 * (this.bw / 59));
+        this.bh = this.h; // Math.round(16 * (this.bw / 9));
         this.bx = this.rx - (this.bw - this.rw) / 2;
         this.by = this.ry - (this.bh - this.rh) / 2;
     };

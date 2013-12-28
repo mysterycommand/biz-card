@@ -26,8 +26,8 @@ define([
         svg.setAttributeNS(null, 'viewBox', [
             0, 0, w, h
         ].join(' '));
-        svg.setAttributeNS(null, 'width', w);
-        svg.setAttributeNS(null, 'height', h);
+        svg.setAttributeNS(null, 'width', w + 'mm');
+        svg.setAttributeNS(null, 'height', h + 'mm');
         return svg;
     }
 

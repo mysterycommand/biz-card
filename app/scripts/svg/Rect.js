@@ -22,10 +22,10 @@ define([
     function Rect(x, y, w, h, stroke, strokeWidth, fill, fillOpacity, attrs) {
         /* jshint expr: true */
         stroke || (stroke = 'black');
-        strokeWidth || (strokeWidth = 1);
+        strokeWidth || (strokeWidth = 0);
 
         fill || (fill = 'none');
-        fillOpacity || (fillOpacity = '1');
+        fillOpacity || (fillOpacity = 0);
 
         var rect = document.createElementNS(NS.SVG, 'rect');
 
