@@ -7,18 +7,11 @@
  */
 /** ================================================================================================================ **/
 
-/* jshint expr: true, bitwise: false */
+/* jshint expr: true, bitwise: false, laxbreak: true */
 
 define([
 
-    'svg/NS',
-    'svg/SVG',
-    'svg/Group',
-
-    'svg/Circle',
-    'svg/Line',
-    'svg/Path',
-    'svg/Rect',
+    'Element',
 
     'util/coinToss',
     'util/percentChance',
@@ -27,14 +20,7 @@ define([
 
 ], function (
 
-    NS,
-    SVG,
-    Group,
-
-    Circle,
-    Line,
-    Path,
-    Rect,
+    Element,
 
     coinToss,
     percentChance,
@@ -46,226 +32,301 @@ define([
     'use strict';
 
     var PHI = (1 + Math.sqrt(5)) / 2,
-        G = (2 * Math.PI) / (PHI * PHI);
+        G = (2 * Math.PI) / (PHI * PHI),
+        area = function(radius) {
+            return Math.PI * (radius * radius);
+        },
+        counter = 0;
 
     var Card = function Card(w, h) {
+        this.id = ('0' + counter++).substr(-2);
         this.w = w;
         this.h = h;
 
-        // this.defs = document.createElementNS(NS.SVG, 'defs');
-        this.svg = new SVG(this.w, this.h);
-        this.front = new Group(0, 0);
+        this.el = Element.svg(w, h, 'mm', { id: 'business-card-' + this.id });
+        this.clip = Element.clipPath({ id: 'clip-' + this.id });
+
+        this.fills = Element.g({ 'class': 'fills', id: 'fills-' + this.id, 'clip-path': 'url(#' + 'clip-' + this.id + ')' });
+        this.strokes = Element.g({ 'class': 'strokes', id: 'strokes-' + this.id, 'clip-path': 'url(#' + 'clip-' + this.id + ')' });
 
         this.draw();
     };
 
-    // Card.prototype.createClipPath = function() {
-    //     this.clipPath = document.createElementNS(NS.SVG, 'clipPath');
-    //     this.clipPath.setAttributeNS(null, 'id', 'frame');
-    //     this.clipPath.appendChild(this.clip);
-    // };
+    Card.prototype = Object.create(Object.prototype, {
+        draw: {
+            enumerable: true,
+            value: function() {
+                this._colors();
+                this._recalc();
 
-    Card.prototype.draw = function() {
-        this.colors();
-        this.recalc();
+                this._empty();
+                this._drawBkgd();
+                this._drawPath();
+                this._center();
+            }
+        },
 
-        this.empty();
-        this.drawFront();
-        this.drawPath();
-        this.center();
-    };
+        _colors: {
+            value: function() {
+                this.hex0 = randomHex();
+                this.hex1 = randomHex();
+                this.hex2 = randomHex();
+                this.hex3 = randomHex();
+                this.hex4 = randomHex();
+                this.hex5 = randomHex();
+                this.hex6 = randomHex();
+                this.hex7 = randomHex();
+                this.hex8 = coinToss()
+                    ? randomHex()
+                    : this.hex0;
+            }
+        },
 
-    Card.prototype.colors = function() {
-        this.hex0 = randomHex();
-        this.hex1 = randomHex();
-        this.hex2 = randomHex();
-        this.hex3 = randomHex();
-        this.hex4 = randomHex();
-        this.hex5 = randomHex();
-        this.hex6 = randomHex();
-        this.hex7 = randomHex();
-        this.hex8 = coinToss() ? this.hex0 : randomHex();
-    };
+        _recalc: {
+            value: function() {
+                this.r = randomRange(2, 4); // (8.75 / 223) * 59;
 
-    Card.prototype.recalc = function() {
-        this.r = randomRange(2, 4); // (8.75 / 223) * 59;
+                this.r0 = this.r * (8 / 13);
+                this.r1 = this.r * (13 / 8);
+                this.r2 = this.r1 * (13 / 8);
+                this.r3 = this.r2 * (21 / 8);
 
-        this.r0 = this.r * (8 / 13);
-        this.r1 = this.r * (13 / 8);
-        this.r2 = this.r1 * (13 / 8);
-        this.r3 = this.r2 * (21 / 8);
+                this.d0 = this.r0 * 2;
+                // this.d1 = this.r1 * 2;
+                this.d2 = this.r2 * 2;
+                this.d3 = this.r3 * 2;
 
-        this.d0 = this.r0 * 2;
-        // this.d1 = this.r1 * 2;
-        this.d2 = this.r2 * 2;
-        this.d3 = this.r3 * 2;
+                this.hw = this.w / 2;
+                this.hh = this.h / 2;
 
-        this.hw = this.w / 2;
-        this.hh = this.h / 2;
+                this.a2 = area(this.r2);
+                this.s2 = Math.sqrt(this.a2);
+                this.hs = this.s2 / 2;
 
-        this.a2 = Circle.area(this.r2);
-        this.s2 = Math.sqrt(this.a2);
-        this.hs = this.s2 / 2;
+                this.aSq = this.r3 * this.r3;
+                this.cSq = this.d3 * this.d3;
+                this.bSq = this.cSq - this.aSq;
+                this.b = Math.sqrt(this.bSq);
 
-        this.aSq = this.r3 * this.r3;
-        this.cSq = this.d3 * this.d3;
-        this.bSq = this.cSq - this.aSq;
-        this.b = Math.sqrt(this.bSq);
+                this.cx1 = this.hw - this.hs;
+                this.cy1 = this.hh - this.hs - this.b;
 
-        this.cx1 = this.hw - this.hs;
-        this.cy1 = this.hh - this.hs - this.b;
+                this.cx2 = this.hw - this.hs + this.r3;
+                this.cy2 = this.hh - this.hs;
 
-        this.cx2 = this.hw - this.hs + this.r3;
-        this.cy2 = this.hh - this.hs;
+                this.inc = Math.atan2(this.r3, this.b);
 
-        this.inc = Math.atan2(this.r3, this.b);
+                this.px1 = this.cx1 + Math.sin(this.inc - G) * this.r3;
+                this.py1 = this.cy1 + Math.cos(this.inc - G) * this.r3;
+                this.px2 = this.cx1 + Math.sin(this.inc) * this.r3;
+                this.py2 = this.cy1 + Math.cos(this.inc) * this.r3;
 
-        this.px1 = this.cx1 + Math.sin(this.inc - G) * this.r3;
-        this.py1 = this.cy1 + Math.cos(this.inc - G) * this.r3;
-        this.px2 = this.cx1 + Math.sin(this.inc) * this.r3;
-        this.py2 = this.cy1 + Math.cos(this.inc) * this.r3;
+                this.rx = ~~(this.px1);
+                this.ry = ~~(this.cy1 - this.r3);
+                this.rw = ~~((this.hw + this.hs + this.d2) - this.px1);
+                this.rh = ~~(this.r3 + this.b + this.s2 + this.d2);
 
-        this.rx = ~~(this.px1);
-        this.ry = ~~(this.cy1 - this.r3);
-        this.rw = ~~((this.hw + this.hs + this.d2) - this.px1);
-        this.rh = ~~(this.r3 + this.b + this.s2 + this.d2);
+                this.bw = this.w; // this.rw * 1.3;
+                this.bh = this.h; // Math.round(16 * (this.bw / 9));
+                this.bx = this.rx - (this.bw - this.rw) / 2;
+                this.by = this.ry - (this.bh - this.rh) / 2;
+            }
+        },
 
-        this.bw = this.w; // this.rw * 1.3;
-        this.bh = this.h; // Math.round(16 * (this.bw / 9));
-        this.bx = this.rx - (this.bw - this.rw) / 2;
-        this.by = this.ry - (this.bh - this.rh) / 2;
-    };
+        _empty: {
+            value: function() {
+                while (this.clip.firstChild) {
+                    this.clip.removeChild(this.clip.firstChild);
+                }
 
-    Card.prototype.empty = function() {
-        while (this.front.firstChild) {
-            this.front.removeChild(this.front.firstChild);
-        }
-    };
+                while (this.fills.firstChild) {
+                    this.fills.removeChild(this.fills.firstChild);
+                }
 
-    function randomAttrs(hex, maxStrokeWidth) {
-        hex || (hex = randomHex());
-        maxStrokeWidth || (maxStrokeWidth = 10);
-        var fill = coinToss(),
-            stroke = coinToss(), // ! fill;
-            strokeWidth = Math.ceil(Math.random() * maxStrokeWidth) / 2,
-            attrs = {
-                'fill': 'none',
-                'stroke': 'none'
-            };
+                while (this.strokes.firstChild) {
+                    this.strokes.removeChild(this.strokes.firstChild);
+                }
+            }
+        },
 
-        if (fill) {
-            attrs.fill = hex;
-            attrs['fill-opacity'] = 0.25 + Math.random() * 0.25;
-        }
-        
-        if (stroke) {
-            attrs.stroke = hex;
-            attrs['stroke-opacity'] = 0.5 + Math.random() * 0.5;
-            attrs['stroke-width'] = strokeWidth;
-        }
+        _randomStroke: {
+            value: function(hex, max) {
+                max || (max = (hex ? 10 : 100));
+                hex || (hex = randomHex());
 
-        if (stroke && percentChance(20)) {
-            attrs['stroke-dasharray'] = [0.001, strokeWidth * 2].join(' ');
-            attrs['stroke-linecap'] = coinToss() ? 'round' : 'square';
-        }
+                var w = Math.ceil(randomRange(0, max)) / 2,
+                    attrs = {
+                        'stroke': hex,
+                        'fill': 'none'
+                    };
 
-        return attrs;
-    }
+                attrs['stroke-opacity'] = Math.random();
+                attrs['stroke-width'] = w;
 
-    Card.prototype.drawFront = function() {
-        var elements = {
-            // white: new Rect(bx, by, this.bw, this.bh, 'none', '0', '#ffffff'),
-            background: new Rect(this.bx, this.by, this.bw, this.bh, null, null, null, null, randomAttrs(null, 100)),
+                if (percentChance(20)) {
+                    attrs['stroke-dasharray'] = [0.001, w * 2].join(' ');
+                    attrs['stroke-linecap'] = coinToss() ? 'round' : 'square';
+                }
+                
+                return attrs;
+            }
+        },
 
-            centerCircle: new Circle(this.hw, this.hh, this.r2, null, null, randomAttrs(this.hex1)),
-            centerCircleSquared: new Rect(this.hw - this.hs, this.hh - this.hs, this.s2, this.s2, null, null, null, null, randomAttrs(this.hex2)),
+        _randomFill: {
+            value: function(hex) {
+                hex || (hex = randomHex());
 
-            squaredCircle: new Circle(this.hw, this.hh, this.hs, null, null, randomAttrs(this.hex3)),
+                var attrs = {
+                    'stroke': 'none',
+                    'fill': hex
+                };
 
-            topRightSquare: new Rect(this.hw + this.hs, this.hh - this.hs - this.d2, this.d2, this.d2, null, null, null, null, randomAttrs(this.hex2)),
-            topRightCircle: new Circle(this.hw + this.hs + this.r2, this.hh - this.hs - this.r2, this.r2, null, null, randomAttrs(this.hex3)),
+                attrs['fill-opacity'] = 0.25 + Math.random() * 0.25;
+                
+                return attrs;
+            }
+        },
 
-            bottomRightSquare: new Rect(this.hw + this.hs, this.hh + this.hs, this.d2, this.d2, null, null, null, null, randomAttrs(this.hex2)),
-            bottomRightCircle: new Circle(this.hw + this.hs + this.r2, this.hh + this.hs + this.r2, this.r2, null, null, randomAttrs(this.hex3)),
-            bottomLeftCircle: new Circle(this.hw - this.hs, this.hh + this.hs, this.r0, null, null, randomAttrs(this.hex2)),
+        _drawBkgd: {
+            value: function() {
+                var elements = {
+                    background: ['rect', null, this.bx, this.by, this.bw, this.bh],
+                    
+                    centerCircle: ['circle', this.hex1, this.hw, this.hh, this.r2],
+                    centerCircleSquared: ['rect', this.hex2, this.hw - this.hs, this.hh - this.hs, this.s2, this.s2],
+                    
+                    squaredCircle: ['circle', this.hex3, this.hw, this.hh, this.hs],
+                    
+                    topRightSquare: ['rect', this.hex2, this.hw + this.hs, this.hh - this.hs - this.d2, this.d2, this.d2],
+                    topRightCircle: ['circle', this.hex3, this.hw + this.hs + this.r2, this.hh - this.hs - this.r2, this.r2],
+                    
+                    bottomRightSquare: ['rect', this.hex2, this.hw + this.hs, this.hh + this.hs, this.d2, this.d2],
+                    bottomRightCircle: ['circle', this.hex3, this.hw + this.hs + this.r2, this.hh + this.hs + this.r2, this.r2],
+                    bottomLeftCircle: ['circle', this.hex2, this.hw - this.hs, this.hh + this.hs, this.r0],
+                    
+                    topLeftBigCircle: ['circle', this.hex4, this.cx1, this.cy1, this.r3],
+                    topLeftBigCircleSpine: ['circle', this.hex4, this.cx2, this.cy2, this.r3],
+                    
+                    hypotenuse: ['line', this.hex5, this.cx1, this.cy1, this.cx2, this.cy2],
+                    adjacent: ['line', this.hex5, this.cx2, this.cy2, this.hw - this.hs, this.hh - this.hs],
+                    opposite: ['line', this.hex5, this.hw - this.hs, this.hh - this.hs, this.cx1, this.cy1],
+                    
+                    golden: ['line', this.hex5, this.px1, this.py1, this.cx1, this.cy1],
+                    incedence: ['line', this.hex5, this.cx1, this.cy1, this.px2, this.py2],
+                    
+                    boundingBox: ['rect', this.hex7, this.rx, this.ry, this.rw, this.rh]
+                },
+                strokes = [],
+                fills = [];
 
-            topLeftBigCircle: new Circle(this.cx1, this.cy1, this.r3, null, null, randomAttrs(this.hex4)),
-            topLeftBigCircleSpine: new Circle(this.cx2, this.cy2, this.r3, null, null, randomAttrs(this.hex4)),
+                Object.keys(elements).forEach(function(key) {
+                    var func = elements[key].shift(),
+                        hex = elements[key].shift(),
+                        attrs;
 
-            hypotenuse: new Line(this.cx1, this.cy1, this.cx2, this.cy2, null, null, randomAttrs(this.hex5)),
-            adjacent: new Line(this.cx2, this.cy2, this.hw - this.hs, this.hh - this.hs, null, null, randomAttrs(this.hex5)),
-            opposite: new Line(this.hw - this.hs, this.hh - this.hs, this.cx1, this.cy1, null, null, randomAttrs(this.hex5)),
+                    if (coinToss()) {
+                        attrs = this._randomStroke(hex);
+                        attrs['class'] = key;
 
-            golden: new Line(this.px1, this.py1, this.cx1, this.cy1, null, null, randomAttrs(this.hex5)),
-            incedence: new Line(this.cx1, this.cy1, this.px2, this.py2, null, null, randomAttrs(this.hex5)),
+                        elements[key].push(attrs);
+                        strokes.push(Element[func].apply(Element, elements[key]));
+                        elements[key].pop();
+                    }
 
-            boundingBox: new Rect(this.rx, this.ry, this.rw, this.rh, null, null, null, null, randomAttrs(this.hex7))
+                    if (coinToss()) {
+                        attrs = this._randomFill(hex);
+                        attrs['class'] = key;
 
-            // lineTL: new Line(this.hw, this.hh, this.bx, this.by, '#000'),
-            // lineTR: new Line(this.hw, this.hh, this.bx + this.bw, this.by, '#000'),
-            // lineBL: new Line(this.hw, this.hh, this.bx, this.by + this.bh, '#000'),
-            // lineBR: new Line(this.hw, this.hh, this.bx + this.bw, this.by + this.bh, '#000'),
+                        elements[key].push(attrs);
+                        fills.push(Element[func].apply(Element, elements[key]));
+                        elements[key].pop();
+                    }
+                }.bind(this));
 
-            // lineTLBR: new Line(this.bx, this.by, this.bx + this.bw, this.by + this.bh, '#000'),
-            // lineTRBL: new Line(this.bx + this.bw, this.by, this.bx, this.by + this.bh, '#000'),
+                strokes.forEach(function(ele) {
+                    this.strokes.appendChild(ele);
+                }.bind(this));
 
-            // frame: new Rect(this.bx, this.by, this.bw, this.bh, '#222222')
-        };
+                fills.forEach(function(ele) {
+                    this.fills.appendChild(ele);
+                }.bind(this));
+            }
+        },
 
-        // console.log((this.w - this.rw) / 2, (this.h - this.rh) / 2);
-        // elements.topLeftBigCircleSpine.setAttributeNS(null, 'clip-path', 'url(#frame)');
+        _drawPath: {
+            value: function() {
+                var strokeWidth = Math.ceil(randomRange(0, 20)),
+                    attrs1,
+                    attrs2,
+                    path1,
+                    path2;
 
-        Object.keys(elements).forEach(function(key) {
-            this.front.appendChild(elements[key]);
-        }.bind(this));
-    };
+                attrs1 = {
+                    'stroke': this.hex0,
+                    'stroke-opacity': Math.random(),
+                    'stroke-width': strokeWidth
+                };
 
-    Card.prototype.drawPath = function() {
-        var strokeWidth = Math.ceil(Math.random() * 20),
-            path1 = new Path(this.hex0, Math.random(), strokeWidth),
-            path2 = new Path(this.hex8, Math.random(), strokeWidth),
-            strokeLinecap;
+                attrs2 = {
+                    'stroke': this.hex8,
+                    'stroke-opacity': Math.random(),
+                    'stroke-width': strokeWidth
+                };
 
-        path1.setAttributeNS(null, 'd', [
-            'M', this.px1, this.py1,
-            'A', this.r3, this.r3, 0, 1, 1, this.px2, this.py2,
-            'A', this.r3, this.r3, 0, 0, 0, this.cx1, this.cy2,
-            'L', this.cx1 + this.s2 + this.r2, this.cy2,
-            'A', this.r2, this.r2, 0, 1, 0, this.cx1 + this.s2, this.cy2 - this.r2,
-            'L', this.hw + this.hs, this.hh + this.hs + this.r2,
-            'A', this.r2, this.r2, 0, 1, 0, this.hw + this.hs + this.r2, this.hh + this.hs,
-            'L', this.hw + this.hs, this.hh + this.hs
-        ].join(' '));
+                if (strokeWidth < 11 && percentChance(20)) {
+                    attrs1['stroke-dasharray'] = [0.001, strokeWidth * 2].join(' ');
+                    attrs1['stroke-linecap'] = coinToss() ? 'round' : 'square';
 
-        path2.setAttributeNS(null, 'd', [
-            'M', this.hw - this.hs + this.r0, this.hh + this.hs - this.r0,
-            'L', this.hw - this.hs, this.hh + this.hs - this.r0,
-            'A', this.r0, this.r0, 0, 1, 0, this.hw - this.hs + this.r0, this.hh + this.hs,
-            'Z'
-        ].join(' '));
+                    if (strokeWidth < 4) {
+                        attrs2['stroke-dasharray'] = [0.001, strokeWidth * 2].join(' ');
+                        attrs2['stroke-linecap'] = coinToss() ? 'round' : 'square';
+                    }
+                }
 
-        if (strokeWidth < 11 && percentChance(20)) {
-            strokeLinecap = coinToss() ? 'round' : 'square';
+                path1 = Element.path([
+                    'M', this.px1, this.py1,
+                    'A', this.r3, this.r3, 0, 1, 1, this.px2, this.py2,
+                    'A', this.r3, this.r3, 0, 0, 0, this.cx1, this.cy2,
+                    'L', this.cx1 + this.s2 + this.r2, this.cy2,
+                    'A', this.r2, this.r2, 0, 1, 0, this.cx1 + this.s2, this.cy2 - this.r2,
+                    'L', this.hw + this.hs, this.hh + this.hs + this.r2,
+                    'A', this.r2, this.r2, 0, 1, 0, this.hw + this.hs + this.r2, this.hh + this.hs,
+                    'L', this.hw + this.hs, this.hh + this.hs
+                ].join(' '), attrs1);
 
-            path1.setAttributeNS(null, 'stroke-dasharray', [0.001, strokeWidth * 2].join(' '));
-            path1.setAttributeNS(null, 'stroke-linecap', strokeLinecap);
-            
-            if (strokeWidth < 4) {
-                path2.setAttributeNS(null, 'stroke-dasharray', [0.001, strokeWidth * 2].join(' '));
-                path2.setAttributeNS(null, 'stroke-linecap', strokeLinecap);
+                path2 = Element.path([
+                    'M', this.hw - this.hs + this.r0, this.hh + this.hs - this.r0,
+                    'L', this.hw - this.hs, this.hh + this.hs - this.r0,
+                    'A', this.r0, this.r0, 0, 1, 0, this.hw - this.hs + this.r0, this.hh + this.hs,
+                    'Z'
+                ].join(' '), attrs2);
+
+                this.strokes.appendChild(path1);
+                this.strokes.appendChild(path2);
+            }
+        },
+
+        _center: {
+            value: function() {
+                var x = ((this.w - this.bw) / 2) - this.bx,
+                    y = ((this.h - this.bh) / 2) - this.by;
+
+                this.clip.appendChild(Element.rect(this.bx, this.by, this.bw, this.bh, { stroke: 'none', fill: randomHex() }));
+
+                this.fills.setAttributeNS(null, 'transform', [
+                    'translate(', x, y, ')'
+                ].join(' '));
+
+                this.strokes.setAttributeNS(null, 'transform', [
+                    'translate(', x, y, ')'
+                ].join(' '));
+                
+                this.el.appendChild(this.clip);
+                this.el.appendChild(this.fills);
+                this.el.appendChild(this.strokes);
             }
         }
-
-        this.front.appendChild(path1);
-        this.front.appendChild(path2);
-    };
-
-    Card.prototype.center = function() {
-        this.front.setAttributeNS(null, 'transform', [
-            'translate(', ((this.w - this.bw) / 2) - this.bx, ((this.h - this.bh) / 2) - this.by, ')'
-        ].join(' '));
-        this.svg.appendChild(this.front);
-    };
+    });
 
     return Card;
 

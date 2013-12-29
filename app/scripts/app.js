@@ -36,7 +36,7 @@ define([
             var card = new Card(w, h);
             $(element)
                 .data('card', card)
-                .find('.front').append(card.svg);
+                .find('.front').append(card.el);
         });
 
         function updateCard(timestamp) {
@@ -73,13 +73,13 @@ define([
                 start = null,
                 delta = 0;
 
-            card || (card = $(this).data('card'));
+            card = $(this).data('card');
             setupPointerEvents($card, $window);
             $window.on('keyup', toggleTimer);
         }
 
         $card.on('click tap', function() {
-            card || (card = $(this).data('card'));
+            card = $(this).data('card');
             card.draw();
             stopTimer();
         });

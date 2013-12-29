@@ -7,8 +7,6 @@
  */
 /** ================================================================================================================ **/
 
-/* jshint expr: true, bitwise: false */
-
 define([
 
 ], function (
@@ -17,7 +15,7 @@ define([
 
     'use strict';
     return function randomRange(min, max) {
-    	return min + (Math.random() * (max - min));
+        return min + (Math.random() * (max - min));
     };
 
 });
