@@ -167,7 +167,7 @@ define([
                     attrs['stroke-dasharray'] = [0.001, w * 2].join(' ');
                     attrs['stroke-linecap'] = coinToss() ? 'round' : 'square';
                 }
-                
+
                 return attrs;
             }
         },
@@ -182,7 +182,7 @@ define([
                 };
 
                 attrs['fill-opacity'] = 0.25 + Math.random() * 0.25;
-                
+
                 return attrs;
             }
         },
@@ -191,29 +191,29 @@ define([
             value: function() {
                 var elements = {
                     background: ['rect', null, this.bx, this.by, this.bw, this.bh],
-                    
+
                     centerCircle: ['circle', this.hex1, this.hw, this.hh, this.r2],
                     centerCircleSquared: ['rect', this.hex2, this.hw - this.hs, this.hh - this.hs, this.s2, this.s2],
-                    
+
                     squaredCircle: ['circle', this.hex3, this.hw, this.hh, this.hs],
-                    
+
                     topRightSquare: ['rect', this.hex2, this.hw + this.hs, this.hh - this.hs - this.d2, this.d2, this.d2],
                     topRightCircle: ['circle', this.hex3, this.hw + this.hs + this.r2, this.hh - this.hs - this.r2, this.r2],
-                    
+
                     bottomRightSquare: ['rect', this.hex2, this.hw + this.hs, this.hh + this.hs, this.d2, this.d2],
                     bottomRightCircle: ['circle', this.hex3, this.hw + this.hs + this.r2, this.hh + this.hs + this.r2, this.r2],
                     bottomLeftCircle: ['circle', this.hex2, this.hw - this.hs, this.hh + this.hs, this.r0],
-                    
+
                     topLeftBigCircle: ['circle', this.hex4, this.cx1, this.cy1, this.r3],
                     topLeftBigCircleSpine: ['circle', this.hex4, this.cx2, this.cy2, this.r3],
-                    
+
                     hypotenuse: ['line', this.hex5, this.cx1, this.cy1, this.cx2, this.cy2],
                     adjacent: ['line', this.hex5, this.cx2, this.cy2, this.hw - this.hs, this.hh - this.hs],
                     opposite: ['line', this.hex5, this.hw - this.hs, this.hh - this.hs, this.cx1, this.cy1],
-                    
+
                     golden: ['line', this.hex5, this.px1, this.py1, this.cx1, this.cy1],
                     incedence: ['line', this.hex5, this.cx1, this.cy1, this.px2, this.py2],
-                    
+
                     boundingBox: ['rect', this.hex7, this.rx, this.ry, this.rw, this.rh]
                 },
                 strokes = [],
@@ -320,7 +320,7 @@ define([
                 this.strokes.setAttributeNS(null, 'transform', [
                     'translate(', x, y, ')'
                 ].join(' '));
-                
+
                 this.el.appendChild(this.clip);
                 this.el.appendChild(this.fills);
                 this.el.appendChild(this.strokes);
